@@ -3,17 +3,13 @@ function isempty(s)
 end
 
 function parent(str)
-    res1 = str:gsub("/[^/]*$", "")
-    res2 = str:gsub("\\[^\\]*$", "")
+    if str == "\\" or str == "/" then return "" end -- *nix or network root
+    res = str:gsub("[/\\]+[^/\\]+[/\\]*$", "")
+    if res == str then return "" end -- Windows root
+    if isempty(res) then return "" end
+    if isempty(res:gsub("\\\\[^/\\]+$", "")) then return "" end -- network root reached
 
-    if not isempty(res1) and isempty(res2) then return res1 end
-    if isempty(res1) and not isempty(res2) then return res2 end
-    if not isempty(res1) and not isempty(res2) then
-        if res1:len() > res2:len() then return res2 end
-        if res1:len() == res2:len() then return "" end -- root
-        return res1
-    end
-    return "" -- ??
+    return res
 end
 
 function git_prompt_filter()
